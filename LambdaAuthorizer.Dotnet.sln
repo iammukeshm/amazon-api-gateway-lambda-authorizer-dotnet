@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentLambda", "StudentLambda\StudentLambda.csproj", "{FB268829-4300-465E-BD9F-F26CFF8C85A8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthLambda", "AuthLambda\AuthLambda.csproj", "{16B0C1BB-62AC-485F-8A79-CB40AE7F8279}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FB268829-4300-465E-BD9F-F26CFF8C85A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB268829-4300-465E-BD9F-F26CFF8C85A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB268829-4300-465E-BD9F-F26CFF8C85A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16B0C1BB-62AC-485F-8A79-CB40AE7F8279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16B0C1BB-62AC-485F-8A79-CB40AE7F8279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16B0C1BB-62AC-485F-8A79-CB40AE7F8279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16B0C1BB-62AC-485F-8A79-CB40AE7F8279}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
