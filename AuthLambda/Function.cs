@@ -21,6 +21,30 @@ public class Function
     public APIGatewayCustomAuthorizerResponse ValidateTokenAsync(APIGatewayCustomAuthorizerRequest request, ILambdaContext context)
     {
         var authToken = request.Headers["authorization"];
+
+        var claimsPrincipal = GetClaimsPrincipal(authToken);
+        var effect = claimsPrincipal == null ? "Deny" : "Allow";
+        var principalId = claimsPrincipal == null ? "401" : claimsPrincipal?.FindFirst(ClaimTypes.Name)?.Value;
+        return new APIGatewayCustomAuthorizerResponse()
+        {
+            PrincipalID = principalId,
+            PolicyDocument = new APIGatewayCustomAuthorizerPolicy()
+            {
+                Statement = new List<APIGatewayCustomAuthorizerPolicy.IAMPolicyStatement>
+            {
+                new APIGatewayCustomAuthorizerPolicy.IAMPolicyStatement()
+                {
+                    Effect = effect,
+                    Resource = new HashSet<string> { "arn:aws:execute-api:ap-south-1:821175633958:sctmtm1ge8/*/*" },
+                    Action = new HashSet<string> { "execute-api:Invoke" }
+                }
+            }
+            }
+        };
+    }
+
+    private ClaimsPrincipal GetClaimsPrincipal(string authToken)
+    {
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParams = new TokenValidationParameters()
         {
@@ -29,25 +53,14 @@ public class Function
             ValidateIssuer = false,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
         };
-        var claimsPrincipal = tokenHandler.ValidateToken(authToken, validationParams, out SecurityToken securityToken);
-        var effect = claimsPrincipal == null ? "Deny" : "Allow";
-        var principalId = claimsPrincipal == null ? "auth-401" : claimsPrincipal?.FindFirst(ClaimTypes.Name)?.Value;
-        return new APIGatewayCustomAuthorizerResponse()
+        try
         {
-            PrincipalID = principalId,
-            PolicyDocument = new APIGatewayCustomAuthorizerPolicy()
-            {
-                Statement = new List<APIGatewayCustomAuthorizerPolicy.IAMPolicyStatement>
-                {
-                    new APIGatewayCustomAuthorizerPolicy.IAMPolicyStatement()
-                    {
-                        Effect = effect,
-                        Resource = new HashSet<string> { "arn:aws:execute-api:ap-south-1:821175633958:sctmtm1ge8/*/*" },
-                        Action = new HashSet<string> { "execute-api:Invoke" }
-                    }
-                }
-            }
-        };
+            return tokenHandler.ValidateToken(authToken, validationParams, out SecurityToken securityToken);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     public async Task<string> GenerateTokenAsync(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
@@ -69,7 +82,7 @@ public class Function
         var claims = new List<Claim> { new(ClaimTypes.Email, user.Email), new(ClaimTypes.Name, user.Username) };
         byte[] secret = Encoding.UTF8.GetBytes(key);
         var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(claims: claims, expires: DateTime.UtcNow.AddMinutes(500), signingCredentials: signingCredentials);
+        var token = new JwtSecurityToken(claims: claims, expires: DateTime.UtcNow.AddMinutes(5), signingCredentials: signingCredentials);
         var tokenHandler = new JwtSecurityTokenHandler();
         return tokenHandler.WriteToken(token);
     }
